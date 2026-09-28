@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>A Small Questionnaire</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --green: #214f43;
+            --light-green: #dce8e2;
+            --cream: #f7f5ef;
+            --text: #242824;
+            --muted: #777b76;
+            --white: #ffffff;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--cream);
+            color: var(--text);
+            font-family: "DM Sans", sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* ---------------- BACKGROUND ---------------- */
+
+        .background {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(2px);
+            opacity: 0.35;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .circle.one {
+            width: 250px;
+            height: 250px;
+            background: #d7e7df;
+            top: -80px;
+            left: -70px;
+        }
+
+        .circle.two {
+            width: 180px;
+            height: 180px;
+            background: #e8ded0;
+            right: -50px;
+            bottom: 10%;
+            animation-delay: 2s;
+        }
+
+        .circle.three {
+            width: 100px;
+            height: 100px;
+            background: #d5e1da;
+            right: 15%;
+            top: 12%;
+            animation-delay: 4s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        /* ---------------- MAIN ---------------- */
+
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 560px;
+            min-height: 650px;
+            background: rgba(255,255,255,0.82);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.8);
+            border-radius: 28px;
+            padding: 45px;
+            box-shadow: 0 25px 70px rgba(40,50,45,0.10);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ---------------- START SCREEN ---------------- */
+
+        .start-screen {
+            text-align: center;
+            animation: fadeUp 0.8s ease;
+        }
+
+        .tiny-label {
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 22px;
+        }
+
+        .start-screen h1 {
+            font-family: "Playfair Display", serif;
+            font-size: clamp(38px, 8vw, 58px);
+            line-height: 1.05;
+            font-weight: 500;
+            margin-bottom: 22px;
+        }
+
+        .start-screen h1 span {
+            font-style: italic;
+            color: var(--green);
+        }
+
+        .intro {
+            max-width: 390px;
+            margin: 0 auto 35px;
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        .start-button {
+            border: none;
+            background: var(--green);
+            color: white;
+            padding: 16px 30px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(33,79,67,0.18);
+        }
+
+        .start-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(33,79,67,0.25);
+        }
+
+        .note {
+            margin-top: 20px;
+            font-size: 11px;
+            color: #aaa;
+        }
+
+        /* ---------------- QUIZ ---------------- */
+
+        .quiz {
+            display: none;
+        }
+
+        .quiz.active {
+            display: block;
+            animation: fadeUp 0.5s ease;
+        }
+
+        .progress-area {
+            margin-bottom: 38px;
+        }
+
+        .progress-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #e5e5e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 20%;
+            background: var(--green);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .question-number {
+            color: var(--green);
+            font-size: 12px;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .question {
+            font-family: "Playfair Display", serif;
+            font-size: clamp(28px, 6vw, 38px);
+            line-height: 1.2;
+            font-weight: 500;
+            margin-bottom: 30px;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .answer {
+            width: 100%;
+            border: 1px solid #dedfd9;
+            background: rgba(255,255,255,0.65);
+            border-radius: 14px;
+            padding: 16px 18px;
+            text-align: left;
+            font-family: "DM Sans", sans-serif;
+            font-size: 14px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .answer:hover {
+            border-color: var(--green);
+            background: #f4f8f5;
+            transform: translateX(4px);
+        }
+
+        .answer.selected {
+            background: var(--green);
+            color: white;
+            border-color: var(--green);
+            transform: translateX(5px);
+        }
+
+        .answer::after {
+            content: "→";
+            float: right;
+            opacity: 0;
+            transition: 0.2s;
+        }
+
+        .answer:hover::after,
+        .answer.selected::after {
+            opacity: 1;
+        }
+
+        /* ---------------- RESULT ---------------- */
+
+        .result {
+            display: none;
+            text-align: center;
+        }
+
+        .result.active {
+            display: block;
+            animation: fadeUp 0.8s ease;
+        }
+
+        .result-icon {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: var(--light-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 27px;
+            animation: pop 0.7s ease;
+        }
+
+        .result h2 {
+            font-family: "Playfair Display", serif;
+            font-size: 42px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .result p {
+            color: var(--muted);
+            line-height: 1.8;
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+
+        .highlight {
+            color: var(--green);
+            font-weight: 600;
+        }
+
+        .small-text {
+            font-size: 12px !important;
+            color: #999 !important;
+            margin-top: 25px;
+        }
+
+        .continue-button {
+            margin-top: 20px;
+            border: none;
+            background: var(--green);
+            color: white;
+            padding: 14px 28px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .continue-button:hover {
+            transform: translateY(-3px);
+        }
+
+        /* ---------------- MUSIC SCREEN ---------------- */
+
+        .music-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .music-screen.active {
+            display: block;
+            animation: fadeUp 1s ease;
+        }
+
+        .music-label {
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 28px;
+        }
+
+        .album {
+            width: 190px;
+            height: 190px;
+            margin: 0 auto 28px;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            position: relative;
+            background: #d9ddd8;
+        }
+
+        /*
+            You can replace this with an image if you want.
+            Example:
+            background-image: url("album.jpg");
+        */
+
+        .album-art {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background:
+                radial-gradient(circle at 30% 30%, #eef1ed, transparent 35%),
+                linear-gradient(135deg, #68786e, #263b32);
+            color: white;
+            font-family: "Playfair Display", serif;
+            font-size: 28px;
+            font-style: italic;
+        }
+
+        .song-title {
+            font-family: "Playfair Display", serif;
+            font-size: 30px;
+            margin-bottom: 5px;
+        }
+
+        .artist {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .song-message {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+            margin: 0 auto 25px;
+            max-width: 350px;
+        }
+
+        .music-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 14px 25px;
+            border-radius: 50px;
+            background: var(--green);
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.3s;
+            box-shadow: 0 10px 25px rgba(33,79,67,0.18);
+        }
+
+        .music-button:hover {
+            transform: translateY(-3px);
+        }
+
+        .music-note {
+            margin-top: 20px;
+            font-size: 11px;
+            color: #aaa;
+        }
+
+        /* ---------------- FLOATING HEARTS ---------------- */
+
+        .heart {
+            position: fixed;
+            bottom: -30px;
+            font-size: 15px;
+            opacity: 0;
+            pointer-events: none;
+            animation: heartFloat 5s linear forwards;
+            z-index: 5;
+        }
+
+        @keyframes heartFloat {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+
+            15% {
+                opacity: 0.7;
+            }
+
+            100% {
+                transform: translateY(-110vh) rotate(25deg);
+                opacity: 0;
+            }
+        }
+
+        /* ---------------- ANIMATIONS ---------------- */
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            70% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* ---------------- MOBILE ---------------- */
+
+        @media (max-width: 600px) {
+
+            .wrapper {
+                padding: 15px;
+            }
+
+            .card {
+                min-height: 620px;
+                padding: 30px 23px;
+                border-radius: 24px;
+            }
+
+            .start-screen h1 {
+                font-size: 40px;
+            }
+
+            .question {
+                font-size: 29px;
+            }
+
+            .answer {
+                padding: 15px;
+            }
+
+            .result h2 {
+                font-size: 35px;
+            }
+
+            .album {
+                width: 170px;
+                height: 170px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background -->
+    <div class="background">
+        <div class="circle one"></div>
+        <div class="circle two"></div>
+        <div class="circle three"></div>
+    </div>
+
+
+    <main class="wrapper">
+
+        <div class="card">
+
+            <!-- ================= START ================= -->
+
+            <section class="start-screen" id="startScreen">
+
+                <div class="tiny-label">
+                    A very serious questionnaire
+                </div>
+
+                <h1>
+                    A small<br>
+                    <span>questionnaire.</span>
+                </h1>
+
+                <p class="intro">
+                    You've been selected for a highly important
+                    research study involving approximately
+                    five questions.
+                    <br><br>
+                    Please answer honestly.
+                    Or don't. I'm not your professor.
+                </p>
+
+                <button class="start-button" onclick="startQuiz()">
+                    Begin →
+                </button>
+
+                <div class="note">
+                    Estimated completion time: 30 seconds
+                </div>
+
+            </section>
+
+
+            <!-- ================= QUIZ ================= -->
+
+            <section class="quiz" id="quiz">
+
+                <div class="progress-area">
+
+                    <div class="progress-top">
+                        <span id="progressText">QUESTION 01</span>
+                        <span id="progressNumber">1 / 5</span>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div
+                            class="progress-fill"
+                            id="progressFill">
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="question-number" id="questionNumber">
+                    01
+                </div>
+
+                <h2 class="question" id="questionText">
+                    How's life treating you lately?
+                </h2>
+
+                <div class="answers" id="answers">
+                </div>
+
+            </section>
+
+
+            <!-- ================= RESULT ================= -->
+
+            <section class="result" id="result">
+
+                <div class="result-icon">
+                    ✓
+                </div>
+
+                <h2>
+                    That's all.
+                </h2>
+
+                <p>
+                    Thank you for participating in this
+                    extremely important scientific research.
+                </p>
+
+                <p>
+                    Although, I should probably admit that
+                    <span class="highlight">
+                        there wasn't really a survey.
+                    </span>
+                </p>
+
+                <p>
+                    I just wanted to check if you're doing okay.
+                </p>
+
+                <p>
+                    So... are you?
+                </p>
+
+                <p class="small-text">
+                    Anyway, take care of yourself.
+                    That's your assignment.
+                </p>
+
+                <button
+                    class="continue-button"
+                    onclick="showMusic()">
+                    There's one more thing →
+                </button>
+
+            </section>
+
+
+            <!-- ================= MUSIC ================= -->
+
+            <section class="music-screen" id="musicScreen">
+
+                <div class="music-label">
+                    One last thing
+                </div>
+
+                <div class="album">
+
+                    <div class="album-art">
+                        Japanese<br>Denim
+                    </div>
+
+                </div>
+
+                <h2 class="song-title">
+                    Japanese Denim
+                </h2>
+
+                <p class="artist">
+                    Daniel Caesar
+                </p>
+
+                <p class="song-message">
+                    No particular reason.
+                    <br>
+                    Just thought you might like this one.
+                </p>
+
+                <!--
+                    IMPORTANT:
+                    Replace YOUR_SONG_LINK_HERE with your
+                    YouTube or Spotify song link.
+                -->
+
+                <a
+                    class="music-button"
+                    href="https://youtu.be/UntQaNlHAfo?si=g5wPsbRTN5u5UNVk"
+                    target="_blank"
+                    rel="noopener noreferrer">
+
+                    ▶ Play song
+
+                </a>
+
+                <div class="music-note">
+                    headphones recommended :)
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+
+    <script>
+
+        /* ==========================================
+           QUESTIONS
+        ========================================== */
+
+        const questions = [
+
+            {
+                question: "How's life treating you lately?",
+                answers: [
+                    "Pretty good",
+                    "Could be better",
+                    "I'm surviving",
+                    "That's classified"
+                ]
+            },
+
+            {
+                question: "Have you eaten today?",
+                answers: [
+                    "Yes",
+                    "Not yet",
+                    "I was waiting for someone to ask",
+                    "Why, are you offering?"
+                ]
+            },
+
+            {
+                question: "How's your week been?",
+                answers: [
+                    "10/10",
+                    "Surprisingly okay",
+                    "A little chaotic",
+                    "We don't talk about it"
+                ]
+            },
+
+            {
+                question: "Be honest. Did you expect this questionnaire?",
+                answers: [
+                    "Not at all",
+                    "A little",
+                    "I knew something was up",
+                    "I'm just curious now"
+                ]
+            },
+
+            {
+                question: "One last question. Are you doing okay, really?",
+                answers: [
+                    "Yes, I'm good",
+                    "I'm getting there",
+                    "Honestly, not really",
+                    "Why do you ask?"
+                ]
+            }
+
+        ];
+
+
+        /* ==========================================
+           VARIABLES
+        ========================================== */
+
+        let currentQuestion = 0;
+
+        const startScreen =
+            document.getElementById("startScreen");
+
+        const quiz =
+            document.getElementById("quiz");
+
+        const result =
+            document.getElementById("result");
+
+        const musicScreen =
+            document.getElementById("musicScreen");
+
+        const questionText =
+            document.getElementById("questionText");
+
+        const answersContainer =
+            document.getElementById("answers");
+
+        const questionNumber =
+            document.getElementById("questionNumber");
+
+        const progressText =
+            document.getElementById("progressText");
+
+        const progressNumber =
+            document.getElementById("progressNumber");
+
+        const progressFill =
+            document.getElementById("progressFill");
+
+
+        /* ==========================================
+           START QUIZ
+        ========================================== */
+
+        function startQuiz() {
+
+            startScreen.style.display = "none";
+
+            quiz.classList.add("active");
+
+            currentQuestion = 0;
+
+            loadQuestion();
+
+        }
+
+
+        /* ==========================================
+           LOAD QUESTION
+        ========================================== */
+
+        function loadQuestion() {
+
+            const q = questions[currentQuestion];
+
+            questionText.textContent = q.question;
+
+            questionNumber.textContent =
+                String(currentQuestion + 1).padStart(2, "0");
+
+            progressText.textContent =
+                "QUESTION " +
+                String(currentQuestion + 1).padStart(2, "0");
+
+            progressNumber.textContent =
+                (currentQuestion + 1) +
+                " / " +
+                questions.length;
+
+            progressFill.style.width =
+                ((currentQuestion + 1) / questions.length * 100) + "%";
+
+
+            answersContainer.innerHTML = "";
+
+
+            q.answers.forEach((answer) => {
+
+                const button =
+                    document.createElement("button");
+
+                button.className = "answer";
+
+                button.textContent = answer;
+
+                button.onclick = function() {
+
+                    selectAnswer(button);
+
+                };
+
+                answersContainer.appendChild(button);
+
+            });
+
+        }
+
+
+        /* ==========================================
+           SELECT ANSWER
+        ========================================== */
+
+        function selectAnswer(button) {
+
+            const allAnswers =
+                document.querySelectorAll(".answer");
+
+            allAnswers.forEach(answer => {
+
+                answer.classList.remove("selected");
+
+            });
+
+            button.classList.add("selected");
+
+
+            /*
+                Small delay makes the transition
+                feel more natural.
+            */
+
+            setTimeout(() => {
+
+                nextQuestion();
+
+            }, 450);
+
+        }
+
+
+        /* ==========================================
+           NEXT QUESTION
+        ========================================== */
+
+        function nextQuestion() {
+
+            if (currentQuestion < questions.length - 1) {
+
+                currentQuestion++;
+
+                quiz.classList.remove("active");
+
+                void quiz.offsetWidth;
+
+                quiz.classList.add("active");
+
+                loadQuestion();
+
+            } else {
+
+                finishQuiz();
+
+            }
+
+        }
+
+
+        /* ==========================================
+           FINISH QUIZ
+        ========================================== */
+
+        function finishQuiz() {
+
+            quiz.style.display = "none";
+
+            result.classList.add("active");
+
+            createHearts();
+
+        }
+
+
+        /* ==========================================
+           MUSIC SCREEN
+        ========================================== */
+
+        function showMusic() {
+
+            result.classList.remove("active");
+
+            musicScreen.classList.add("active");
+
+            createHearts();
+
+        }
+
+
+        /* ==========================================
+           FLOATING HEARTS
+        ========================================== */
+
+        function createHearts() {
+
+            const symbols = ["♡", "♥", "·"];
+
+            for (let i = 0; i < 12; i++) {
+
+                const heart =
+                    document.createElement("div");
+
+                heart.className = "heart";
+
+                heart.textContent =
+                    symbols[Math.floor(Math.random() * symbols.length)];
+
+                heart.style.left =
+                    Math.random() * 100 + "vw";
+
+                heart.style.animationDuration =
+                    (4 + Math.random() * 4) + "s";
+
+                heart.style.fontSize =
+                    (10 + Math.random() * 15) + "px";
+
+                document.body.appendChild(heart);
+
+
+                setTimeout(() => {
+
+                    heart.remove();
+
+                }, 8000);
+
+            }
+
+        }
+
+    </script>
+
+</body>
+</html>
